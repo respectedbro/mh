@@ -1,12 +1,15 @@
 @use "../variables" as *;
+@use "../media" as *;
 
 .store {
     padding-top: 120px;
     padding-bottom: 120px;
+
     &__header {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        padding-bottom: 40px;
+        margin-bottom: 40px;
     }
 
     &__catigories {
@@ -20,7 +23,7 @@
         position: relative;
 
         &_active {
-        color: $green;
+            color: $green;
         }
 
         &:after {
@@ -42,22 +45,52 @@
 
 
     &__cart-button {
+        position: relative;
+        display: block;
+        width: 28px;
+        height: 28px;
+    }
+
+    &__cart-cnt {
+        position: relative;
+        z-index: 2;
+        font-weight: 700;
+        font-size: 12px;
+        line-height: 1;
+        color: $light;
+    }
+
+    &__cart-icon {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
     }
 
     &__title {
+        font-weight: 700;
+        font-size: 52px;
+        color: $green;
+        margin-bottom: 32px;
     }
 
     &__list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 420px);
+        justify-content: center;
+        gap: 20px;
+
+        @include mobile {
+            drid-template-colums: 1fr;
+        }
     }
 
     &__item {
+        display: flex;
     }
 
-    &__product {
-    }
-}
-.container {
+
 }
 
-.title {
-}
+.container {}
+
+.title {}
