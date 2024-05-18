@@ -1,3 +1,5 @@
+import { counters } from "sharp";
+
 const API_URL = 'https://stormy-twisty-snowflake.glitch.me'
 // /api/products/category
 const buttons = document.querySelectorAll('.store__catigory-button');
@@ -10,7 +12,7 @@ const cartItemsList = document.querySelector('.modal__cart-items')
 const modalCloseButton = document.querySelector('.modal-overlay_close-button')
 
 
-const createProductCard = ({photoUrl, name, price}) => {
+const createProductCard = ({ id, photoUrl, name, price }) => {
     const productCard = document.createElement('li');
     productCard.classList.add('store__item');
     productCard.innerHTML = `
@@ -21,10 +23,10 @@ const createProductCard = ({photoUrl, name, price}) => {
 
         <p class="product__price">${price}&nbsp;</p>
 
-        <button class="product_btn-add-cart">Заказать</button>
+        <button class="product_btn-add-cart" data-id="${id}">Заказать</button>
             </article>
 `;
-return productCard;
+    return productCard;
 };
 
 const renderProducts = (products) => {
@@ -58,7 +60,7 @@ const fetchProductByCategory = async (category) => {
 }
 
 
-const changeCategory = ({target}) => {
+const changeCategory = ({ target }) => {
     const category = target.textContent;
     buttons.forEach((button) => {
         button.classList.remove('store__catigory-button_active');
@@ -70,9 +72,9 @@ const changeCategory = ({target}) => {
 
 buttons.forEach((button) => {
     button.addEventListener('click', changeCategory);
-    if(button.classList.contains('store__catigory-button_active')) {
+    if (button.classList.contains('store__catigory-button_active')) {
         fetchProductByCategory(button.textContent);
-    }  
+    }
 });
 
 const renderCartItems = () => {
@@ -90,35 +92,42 @@ cartButton.addEventListener('click', () => {
     modalOverlay.style.display = 'flex';
     renderCartItems();
 });
-modalOverlay.addEventListener('click', ({target}) => {
-    if(
-        target === modalOverlay || 
+modalOverlay.addEventListener('click', ({ target }) => {
+    if (
+        target === modalOverlay ||
         target.closest('.modal-overlay_close-button')
-    ) {  
-        modalOverlay.style.display = 'none';    
+    ) {
+        modalOverlay.style.display = 'none';
     }
-    
+
 });
 
 const updateCartCount = () => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]') ;
+    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
     cartCount.textContent = cartItems.length;
 };
 
 updateCartCount();
 
-const addToCart = (productName) => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]') ;
-    cartItems.push(productName);
+const addToCart = (productId) => {
+    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+
+    const existingItem = cartItems.find((item) => item.id === productId);
+
+    if(existingItem) {
+        existingItem.count += 1;
+    } else {
+        cartItems.push({id: productId, count: 1});
+    }
+
+
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
     updateCartCount();
 };
 
-productList.addEventListener('click', ({target}) => {
-    if(target.closest('.product_btn-add-cart')) {
-        const productCard = target.closest('.store__product')
-        const productName = productCard.querySelector('.product__title').textContent;
-        addToCart(productName)
+productList.addEventListener('click', ({ target }) => {
+    if (target.closest('.product_btn-add-cart')) {
+        const productId = parseInt(target.dataset.id, 10);    
+        addToCart(productId)
     }
-    
-})
+});
