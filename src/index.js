@@ -245,10 +245,10 @@ const submitOrder = async (e) => {
     const storeId = cartForm.store.value;
     const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
 
-    const products = cartItems.map(({id, count}) => ({    
+    const products = cartItems.map(({id, count}) => ({
         id,
         quantity: count,
-    }))
+    }));
 
     try {
         const response = await fetch(`${API_URL}/api/orders`, {
@@ -256,10 +256,10 @@ const submitOrder = async (e) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-             body: JSON.stringify({storeId, products}),
+            body: JSON.stringify({storeId, products}),
         });
         if(!response.ok) {
-            throw new Error(response.status)
+            throw new Error(response.status);
         }
 
         localStorage.removeItem('cartItems');
@@ -267,7 +267,8 @@ const submitOrder = async (e) => {
 
         const {orderId} = await response.json();
 
-        orderMessageText.textContent = `Ваш заказ оформлен, номер ${orderId}. Вы можете забрать его завтра, после 12:00`;
+        const tomorrowDate = getTomorrowDate();
+        orderMessageText.textContent = `Ваш заказ оформлен, номер ${orderId}. Вы можете забрать его завтра, ${tomorrowDate}, после 12:00`;
 
         document.body.append(orderMessageElement);
         modalOverlay.style.display = 'none';
@@ -275,8 +276,18 @@ const submitOrder = async (e) => {
     } catch (error) {
         console.error(`Ошибка оформления заказа: ${error}`);
     }
-
 };
 
 cartForm.addEventListener('submit', submitOrder);
+
+
+const getTomorrowDate = () => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const day = String(tomorrow.getDate()).padStart(2, '0');
+    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const year = tomorrow.getFullYear();
+    return `${day}.${month}.${year}`;
+};
 
